@@ -1,0 +1,39 @@
+#!/bin/bash
+
+function checkTask()
+{
+  if [ -s $WORKSPACE/task.list ] && [[ $(cat $WORKSPACE/task.list) != $(crontab -l) ]]; then
+    echo "task has been updated, refreshing the task..."
+    crontab $WORKSPACE/task.list
+  fi
+}
+
+function checkEnv()
+{
+  if [ -f $WORKSPACE/env.sh ]; then
+    # create symbolic link
+    if [ ! -f /etc/profile.d/env.sh ]; then
+      ln -s $WORKSPACE/env.sh /etc/profile.d/env.sh
+    fi
+    # diff md5
+    if [ -f /root/md5_new ]; then
+      md5sum $WORKSPACE/env.sh > /root/md5_old
+      diff /root/md5_new /root/md5_old > /dev/null 2>&1
+      if [ $? -ne 0 ]; then
+        echo "env has been updated, refreshing the env..."
+        source /etc/profile
+        md5sum $WORKSPACE/env.sh > /root/md5_new
+      fi
+    else
+      md5sum $WORKSPACE/env.sh > /root/md5_new
+    fi
+  fi
+}
+
+function main()
+{
+  checkTask 
+  checkEnv 
+}
+
+main 2>&1 | sed "s#^#[services.d] loop: \1#g"

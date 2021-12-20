@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+echo "[services.d] auto refresh service running successful."
+
+exec s6-setuidgid root loop -e 9s -- ./refresh-ini

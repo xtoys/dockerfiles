@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+
+function initEnv() 
+{
+  echo "................................"  
+}
+
+initEnv 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
