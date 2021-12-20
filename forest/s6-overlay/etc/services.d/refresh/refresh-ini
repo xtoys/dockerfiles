@@ -1,39 +1,29 @@
 #!/bin/bash
 
-function checkTask()
-{
-  if [ -s $WORKSPACE/task.list ] && [[ $(cat $WORKSPACE/task.list) != $(crontab -l) ]]; then
-    echo "task has been updated, refreshing the task..."
-    crontab $WORKSPACE/task.list
+# checkTask
+if [ -s $WORKSPACE/task.list ] && [[ $(cat $WORKSPACE/task.list) != $(crontab -l) ]]; then
+  echo "[services.d] loop: task has been updated, refreshing the task..."
+  crontab $WORKSPACE/task.list
+fi
+
+# checkEnv
+if [ -f $WORKSPACE/env.sh ]; then
+  # create symbolic link
+  if [ ! -f ~/.bashrc ]; then
+    ln -s $WORKSPACE/env.sh ~/.bashrc
   fi
-}
-
-function checkEnv()
-{
-  if [ -f $WORKSPACE/env.sh ]; then
-    # create symbolic link
-    if [ ! -f /etc/profile.d/env.sh ]; then
-      ln -s $WORKSPACE/env.sh /etc/profile.d/env.sh
+  # diff md5
+  if [ -f ~/md5_new ]; then
+    md5sum $WORKSPACE/env.sh > ~/md5_old
+    diff ~/md5_new ~/md5_old > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      echo "[services.d] loop: env has been updated, refreshing the env..."
+      source ~/.bashrc
+      md5sum $WORKSPACE/env.sh > ~/md5_new
     fi
-    # diff md5
-    if [ -f /root/md5_new ]; then
-      md5sum $WORKSPACE/env.sh > /root/md5_old
-      diff /root/md5_new /root/md5_old > /dev/null 2>&1
-      if [ $? -ne 0 ]; then
-        echo "env has been updated, refreshing the env..."
-        source /etc/profile
-        md5sum $WORKSPACE/env.sh > /root/md5_new
-      fi
-    else
-      md5sum $WORKSPACE/env.sh > /root/md5_new
-    fi
+  else
+    md5sum $WORKSPACE/env.sh > ~/md5_new
   fi
-}
-
-function main()
-{
-  checkTask 
-  checkEnv 
-}
-
-main 2>&1 | sed "s#^#[services.d] loop: \1#g"
+  # mount env
+  source ~/.bashrc
+fi
