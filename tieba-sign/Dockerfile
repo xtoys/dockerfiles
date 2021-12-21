@@ -5,9 +5,7 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ " \
     LANG=zh_CN.UTF-8 \
-    TZ=Asia/Shanghai \
-    RUN_AT="20 5 * * *" \
-    WORKSPACE=/scripts 
+    TZ=Asia/Shanghai
 
 COPY s6-overlay /
 
@@ -19,11 +17,11 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
        s6-overlay \
     && pip install -i https://mirrors.ustc.edu.cn/pypi/web/simple pip -U \
     && pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/web/simple \
-    && pip install tieba-sign \
+    && pip install --upgrade requests \
     && rm -rf /tmp/* \
     && rm -rf /root/.cache \
     && chmod -R +x /etc/cont-init.d \
     && chmod -R +x /etc/services.d
 
-WORKDIR $WORKSPACE
+WORKDIR /scripts 
 ENTRYPOINT ["/init"]
