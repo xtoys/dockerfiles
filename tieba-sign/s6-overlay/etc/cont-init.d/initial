@@ -1,0 +1,22 @@
+#!/usr/bin/with-contenv bash
+
+
+function addTask()
+{
+  local LIST_PATH=${WORKSPACE}/task.list
+  local LOGS_PATH=${WORKSPACE}/task.log
+  local CRON_TASK="'${RUN_AT}' tieba-sign -v '${BDUSS}' >> ${LOGS_PATH} 2>&1"
+
+  [[ ! -f ${LOGS_PATH} ]] && touch ${LOGS_PATH}
+  [[ ! -f ${LIST_PATH} ]] && echo ${CRON_TASK} > ${LIST_PATH} 
+  crontab ${LIST_PATH} && echo "task added successfully !"
+}
+
+function initEnv() 
+{
+  echo "........................................"
+  addTask
+  echo "........................................"
+}
+
+initEnv 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"

@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+echo "[services.d] cron service running successful."
+
+exec s6-setuidgid root crond -f &>/dev/null
