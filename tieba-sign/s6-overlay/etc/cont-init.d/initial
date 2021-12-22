@@ -7,7 +7,7 @@ function initEnv()
 
   echo "........................................"
 
-  [[ ! -f ${LOGS_PATH} ]] && mkdir ${LOGS_PATH}
+  [[ ! -d ${LOGS_PATH} ]] && mkdir ${LOGS_PATH}
   [[ $(cat ${LIST_PATH}) != $(crontab -l) ]] && crontab ${LIST_PATH} 
   echo "task added successfully !"
   

@@ -1,4 +1,4 @@
-FROM python:alpine3.14
+FROM alpine:3.14
 LABEL container.maintainer="xtoys <echoless@yeah.net>"
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -14,8 +14,10 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
     && apk --no-cache add -f \
        bash \
        tzdata \
+       python3 \
+       py3-pip \
        s6-overlay \
-    && pip install -i https://mirrors.ustc.edu.cn/pypi/web/simple pip -U \
+    && ln -s /usr/bin/python3 /usr/bin/python \
     && pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/web/simple \
     && pip install --upgrade requests \
     && rm -rf /tmp/* \
