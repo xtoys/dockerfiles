@@ -7,6 +7,7 @@ ENV SHELL=/bin/bash \
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
     && apk add --no-cache --update bash tzdata s6-overlay \
-    && rm -rf /tmp/* \
+    && rm -rf /tmp/* 
 
+WORKDIR /root
 ENTRYPOINT ["/init"]
